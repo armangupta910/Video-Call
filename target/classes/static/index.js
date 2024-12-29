@@ -72,6 +72,20 @@ connectBtn.onclick = () => {
   localID = localIdInp.value;
   console.log("My ID: " + localID);
   stompClient.connect({}, (frame) => {
+
+    window.onbeforeunload = function() {
+        if (stompClient) {
+            // Send disconnect message to server
+            stompClient.send("/app/disconnectUser", {}, JSON.stringify({
+                username: localID,
+                clientId: clientId
+            }));
+            
+            // Properly close the WebSocket connection
+            stompClient.disconnect();
+        }
+    };
+
     // Add this here, inside the connect callback
     hangUpBtn.onclick = () => {
       console.log("Hanging up...");
@@ -153,7 +167,7 @@ connectBtn.onclick = () => {
           // Update the status to "Connected"
 
           const statusElement = document.querySelector(".status p");
-          
+
           statusElement.textContent = "Connected";
           statusElement.style.color = "#28a745"; // Green color for connected status
           statusElement.previousElementSibling.style.backgroundColor = "#28a745"; 
@@ -467,10 +481,3 @@ callBtn.onclick = () => {
 testConnection.onclick = () => {
   stompClient.send("/app/testServer", {}, "Test Server");
 };
-
-// callBtn.disabled = false;
-//             callBtn.style.backgroundColor = "#007bff";
-//             connectBtn.disabled = true;
-//             connectBtn.style.backgroundColor = "#d9d9d9";
-//             hangUpBtn.disabled = true;
-//             hangUpBtn.style.backgroundColor = "#d9d9d9";

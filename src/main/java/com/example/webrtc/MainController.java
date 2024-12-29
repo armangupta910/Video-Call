@@ -89,6 +89,8 @@ public class MainController {
         );
     }
 
+    
+
     @MessageMapping("/call")
     public void Call(String call) {
         JSONObject jsonObject = new JSONObject(call);
@@ -97,6 +99,24 @@ public class MainController {
                 + jsonObject.get("callFrom").getClass());
         simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("callTo"), "/topic/call",
                 jsonObject.get("callFrom"));
+    }
+
+    @MessageMapping("/disconnectUser")
+    public void disconnectUser(DisconnectRequest request) {
+        // Remove user from the users array
+        users.remove(request.getUsername());
+        System.out.println("User disconnected: " + request.getUsername());
+    }
+
+    private static class DisconnectRequest {
+        private String username;
+        private String clientId;
+        
+        // getters and setters
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+        public String getClientId() { return clientId; }
+        public void setClientId(String clientId) { this.clientId = clientId; }
     }
 
     @MessageMapping("/offer")
