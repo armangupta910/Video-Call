@@ -61,19 +61,32 @@ public class MainController {
         simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/hangup", fromUser + " has ended the call.");
     }
 
+    // Create a class to hold the request data
+    private static class UserRequest {
+        public String username;
+        public String clientId;
+
+
+        
+        // getters and setters
+    }
+
     @MessageMapping("/addUser")
-    public void addUser(String user) {
+    public void addUser(UserRequest request) {
         String response;
-        if (users.contains(user)) {
-            response = "User already exists: " + user;
+        if (users.contains(request.username)) {
+            response = "User already exists: " + request.username;
         } else {
-            users.add(user);
+            users.add(request.username);
             response = "success";
         }
         System.out.println(response);
         
-        // Send to dynamic destination
-        simpMessagingTemplate.convertAndSend("/topic/" + user + "/userResponse", response);
+        // Send to specific client using both username and clientId
+        simpMessagingTemplate.convertAndSend(
+            "/topic/" + request.username + "/" + request.clientId + "/userResponse", 
+            response
+        );
     }
 
     @MessageMapping("/call")
