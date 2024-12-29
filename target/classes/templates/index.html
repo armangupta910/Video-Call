@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js" integrity="sha512-1QvjE7BtotQjkq8PxLeF6P46gEpBRXuskzIVgjFpekzFVF4yjRgrQvTG1MTOJ3yQgvTteKAcO7DSZI92+u/yZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .status {
+            position: absolute;
+            top: 5px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #db2b2b;
+        }
+
+        .status span {
+            width: 10px;
+            height: 10px;
+            background-color: #db2b2b;
+            border-radius: 50%;
+            margin-right: 5px;
+            margin-bottom: 0px;
+        }
+
+        header .status {
+            margin-bottom: 20px; /* Added margin to create vertical space */
+        }
+
+        h1 {
+            margin-top: 20px; /* Additional space for h1 */
+        }
+
+
+        header fieldset {
+            margin-bottom: 10px;
+        }
+
+        header input, header button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        header button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        header button:hover {
+            background-color: #0056b3;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            position: relative;
+        }
+
+        video {
+            flex: 1;
+            object-fit: cover;
+            width: calc(50% - 5px);
+            height: 100%;
+            background-color: black;
+        }
+
+        .divider {
+            width: 5px;
+            background-color: #ccc;
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            transform: translateX(-50%);
+        }
+
+        #callDialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #callDialog button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #acceptCall {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #rejectCall {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #callDialog button:hover {
+            opacity: 0.9;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="status">
+            <span></span>
+            <p>Disconnected</p>
+        </div>
+        <h1>WebRTC Test</h1>
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <fieldset style="flex: 1; display: flex; justify-content: space-between; align-items: center;">
+                <input type="text" name="localId" id="localId" placeholder="Enter Your ID" style="flex: 1; margin-right: 10px;">
+                <button id="connectBtn">Connect</button>
+            </fieldset>
+            <fieldset>
+                <input type="text" name="remoteId" id="remoteId" placeholder="Enter Remote ID">
+                <button id="callBtn">Call</button>
+                <button id="hangUpBtn" style="min-width: 100px;">Hang Up</button>
+            </fieldset>
+            
+        </div>
+    </header>
+    <main>
+        <video id="localVideo" autoplay muted></video>
+        <div class="divider"></div>
+        <video id="remoteVideo" autoplay></video>
+    </main>
+    <div id="callDialog">
+        <p id="callerInfo"></p>
+        <button id="acceptCall">Accept</button>
+        <button id="rejectCall">Reject</button>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
