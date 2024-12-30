@@ -95,10 +95,8 @@ public class MainController {
     public void Call(String call) {
         JSONObject jsonObject = new JSONObject(call);
         System.out.println("Calling to: " + jsonObject.get("callTo") + " Call from " + jsonObject.get("callFrom"));
-        System.out.println("Calling to class: " + jsonObject.get("callTo").getClass() + " Call from class "
-                + jsonObject.get("callFrom").getClass());
-        simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("callTo"), "/topic/call",
-                jsonObject.get("callFrom"));
+        System.out.println("Calling to class: " + jsonObject.get("callTo").getClass() + " Call from class " + jsonObject.get("callFrom").getClass());
+        simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("callTo"), "/topic/call", jsonObject.get("callFrom"));
     }
 
     @MessageMapping("/disconnectUser")

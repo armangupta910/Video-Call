@@ -1,3 +1,6 @@
+com/example/webrtc/HangupRequest.class
+com/example/webrtc/MainController$DisconnectRequest.class
 com/example/webrtc/MainController.class
 com/example/webrtc/WebSocketConfig.class
+com/example/webrtc/MainController$UserRequest.class
 com/example/webrtc/WebRtcApplication.class

@@ -22,14 +22,21 @@ callBtn.style.backgroundColor = "#d9d9d9";
 hangUpBtn.disabled = true;
 hangUpBtn.style.backgroundColor = "#d9d9d9";
 
+console.log("Started");
+
 // ICE Server Configurations
 const iceServers = {
+
   iceServer: {
     urls: "stun:stun.l.google.com:19302",
   },
 };
 
+console.log("Next 1");
+
 localPeer = new RTCPeerConnection(iceServers);
+
+console.log("Next 2");
 
 navigator.mediaDevices
   .getUserMedia({ video: true, audio: true })
@@ -65,9 +72,14 @@ localPeer.onconnectionstatechange = () => {
   }
 };
 
+localPeer.oniceconnectionstatechange = () => {
+  console.log("ICE Connection State:", localPeer.iceConnectionState);
+};
+
 connectBtn.onclick = () => {
   // Connect to Websocket Server
-  var socket = new SockJS("/websocket", { debug: false });
+  console.log("Button Pressed");
+  var socket = new SockJS("/websocket", { debug: false }); // Add the link in this format :- ""https://<IP>:<PORT>/websocket
   stompClient = Stomp.over(socket);
   localID = localIdInp.value;
   console.log("My ID: " + localID);
@@ -207,7 +219,7 @@ connectBtn.onclick = () => {
                   remoteVideo.srcObject = event.streams[0];
                 };
       
-                // Handle ICE candidates
+                // Handle ICE candidates when they come
                 localPeer.onicecandidate = (event) => {
                   if (event.candidate) {
                     var candidate = {
@@ -323,6 +335,7 @@ connectBtn.onclick = () => {
               localPeer.ontrack = (event) => {
                 remoteVideo.srcObject = event.streams[0];
               };
+              
               localPeer.onicecandidate = (event) => {
                 if (event.candidate) {
                   var candidate = {
