@@ -15,21 +15,44 @@ let stompClient;
 
 let isOnCall = false;
 
+// showRemoteLoading()
+
 connectBtn.disabled = false;
 connectBtn.style.backgroundColor = "#007bff";
 callBtn.disabled = true;
-callBtn.style.backgroundColor = "#d9d9d9";
+callBtn.style.backgroundColor = "#878787";
 hangUpBtn.disabled = true;
-hangUpBtn.style.backgroundColor = "#d9d9d9";
+hangUpBtn.style.backgroundColor = "#878787";
 
 console.log("Started");
 
 // ICE Server Configurations
 const iceServers = {
-
-  iceServer: {
-    urls: "stun:stun.l.google.com:19302",
-  },
+  iceServers: [
+    {
+      urls: "stun:stun.relay.metered.ca:80",
+    },
+    {
+      urls: "turn:global.relay.metered.ca:80",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+    {
+      urls: "turn:global.relay.metered.ca:80?transport=tcp",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+    {
+      urls: "turn:global.relay.metered.ca:443",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+    {
+      urls: "turns:global.relay.metered.ca:443?transport=tcp",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+],
 };
 
 console.log("Next 1");
@@ -62,6 +85,7 @@ localPeer.onconnectionstatechange = () => {
   if (localPeer.connectionState === "connected") {
     isOnCall = true; // Set the flag when the connection is established
     console.log("WebRTC connection established, isOnCall set to true");
+    hideRemoteLoading()
   } else if (
     localPeer.connectionState === "disconnected" ||
     localPeer.connectionState === "closed" ||
@@ -79,7 +103,9 @@ localPeer.oniceconnectionstatechange = () => {
 connectBtn.onclick = () => {
   // Connect to Websocket Server
   console.log("Button Pressed");
-  var socket = new SockJS("/websocket", { debug: false }); // Add the link in this format :- ""https://<IP>:<PORT>/websocket
+  var socket = new SockJS("https://13.61.10.86:3000/websocket", { debug: false });
+  //   var socket = new SockJS("https://192.168.101.7:3000/websocket", { debug: false });
+
   stompClient = Stomp.over(socket);
   localID = localIdInp.value;
   console.log("My ID: " + localID);
@@ -147,11 +173,13 @@ connectBtn.onclick = () => {
       alert("Call ended successfully.");
 
       connectBtn.disabled = true;
-      connectBtn.style.backgroundColor = "#d9d9d9";
+      connectBtn.style.backgroundColor = "#878787";
       callBtn.disabled = false;
-      callBtn.style.backgroundColor = "#007bff";
+      callBtn.style.backgroundColor = "#059669";
       hangUpBtn.disabled = true;
-      hangUpBtn.style.backgroundColor = "#d9d9d9";
+      hangUpBtn.style.backgroundColor = "#878787";
+
+      hideRemoteLoading()
     };
 
     console.log("Frame is :- " + frame);
@@ -169,11 +197,11 @@ connectBtn.onclick = () => {
         if (message.body == "success") {
           console.log("Message :- " + message.body);
           callBtn.disabled = false;
-          callBtn.style.backgroundColor = "#007bff";
+          callBtn.style.backgroundColor = "#059669";
           connectBtn.disabled = true;
-          connectBtn.style.backgroundColor = "#d9d9d9";
+          connectBtn.style.backgroundColor = "#878787";
           hangUpBtn.disabled = true;
-          hangUpBtn.style.backgroundColor = "#d9d9d9";
+          hangUpBtn.style.backgroundColor = "#878787";
 
 
           // Update the status to "Connected"
@@ -192,6 +220,7 @@ connectBtn.onclick = () => {
           stompClient.subscribe(
             "/user/" + localIdInp.value + "/topic/call",
             (call) => {
+                showRemoteLoading()
               console.log("Call From: " + call.body);
               remoteID = call.body;
               console.log("Remote ID: " + call.body);
@@ -202,11 +231,12 @@ connectBtn.onclick = () => {
               const acceptCall = document.getElementById("acceptCall");
               const rejectCall = document.getElementById("rejectCall");
       
-              callerInfo.innerText = "Incoming call from ${remoteID}";
+              callerInfo.innerText = "Incoming call from " + remoteID;
               callDialog.style.display = "block";
       
               // Handle Accept Call
               acceptCall.onclick = () => {
+                  hideRemoteLoading()
                 callDialog.style.display = "none"; // Hide the dialog
       
                 // Create a new RTCPeerConnection for the new call
@@ -262,21 +292,25 @@ connectBtn.onclick = () => {
                 });
 
                 connectBtn.disabled = true;
-                connectBtn.style.backgroundColor = "#d9d9d9";
+                connectBtn.style.backgroundColor = "#878787";
                 callBtn.disabled = true;
-                callBtn.style.backgroundColor = "#d9d9d9";
+                callBtn.style.backgroundColor = "#878787";
                 hangUpBtn.disabled = false;
-                hangUpBtn.style.backgroundColor = "#007bff";
+                hangUpBtn.style.backgroundColor = "#dc2626";
               };
       
               // Handle Reject Call
               rejectCall.onclick = () => {
+                  hideRemoteLoading()
                 callDialog.style.display = "none"; // Hide the dialog
                 console.log("Call Rejected");
+
+
       
                 // Notify User A about the rejection
                 stompClient.send(
                   "/app/reject",
+
                   {},
                   JSON.stringify({
                     toUser: remoteID, // User A's ID
@@ -302,9 +336,37 @@ connectBtn.onclick = () => {
               rejectionDialog.style.background = "white";
               rejectionDialog.style.border = "1px solid black";
               rejectionDialog.style.zIndex = "1000";
-      
-              rejectionDialog.innerHTML =
-                "<p>${rejectMessage.body}</p><button id='closeRejectionDialog'>Close</button>";
+
+                rejectionDialog.innerHTML = `
+    <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: black;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        width: 300px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+        <p>${remoteID} has rejected your call</p>
+        <button id="closeRejectionDialog" style="
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;">Close</button>
+    </div>
+`;
       
               document.body.appendChild(rejectionDialog);
       
@@ -315,11 +377,13 @@ connectBtn.onclick = () => {
               isOnCall = false; // Ensure the flag remains false
       
               connectBtn.disabled = true;
-              connectBtn.style.backgroundColor = "#d9d9d9";
+              connectBtn.style.backgroundColor = "#878787";
               callBtn.disabled = false;
-              callBtn.style.backgroundColor = "#007bff";
+              callBtn.style.backgroundColor = "#059669";
               hangUpBtn.disabled = true;
-              hangUpBtn.style.backgroundColor = "#d9d9d9";
+              hangUpBtn.style.backgroundColor = "#878787";
+
+              hideRemoteLoading()
             }
           );
       
@@ -394,6 +458,7 @@ connectBtn.onclick = () => {
             "/user/" + localIdInp.value + "/topic/candidate",
             (answer) => {
               console.log("Candidate Came");
+                hideRemoteLoading()
               var o = JSON.parse(answer.body)["candidate"];
               console.log(o);
               console.log(o["label"]);
@@ -403,6 +468,8 @@ connectBtn.onclick = () => {
                 candidate: o["id"],
               });
               localPeer.addIceCandidate(iceCandidate);
+
+
             }
           );
       
@@ -423,16 +490,18 @@ connectBtn.onclick = () => {
             alert("Call has been ended by the other user.");
       
             connectBtn.disabled = true;
-            connectBtn.style.backgroundColor = "#d9d9d9";
+            connectBtn.style.backgroundColor = "#878787";
             callBtn.disabled = false;
-            callBtn.style.backgroundColor = "#007bff";
+            callBtn.style.backgroundColor = "#059669";
             hangUpBtn.disabled = true;
-            hangUpBtn.style.backgroundColor = "#d9d9d9";
+            hangUpBtn.style.backgroundColor = "#878787";
+
+            hideRemoteLoading()
           });
 
 
         } else {
-          alert("Could not connect! Try again later");
+          alert("Another user is already using this username. Please try some other username");
         }
       }
     );
@@ -483,14 +552,26 @@ callBtn.onclick = () => {
   );
 
   connectBtn.disabled = true;
-  connectBtn.style.backgroundColor = "#d9d9d9";
+  connectBtn.style.backgroundColor = "#878787";
   callBtn.disabled = true;
-  callBtn.style.backgroundColor = "#d9d9d9";
+  callBtn.style.backgroundColor = "#878787";
   hangUpBtn.disabled = false;
-  hangUpBtn.style.backgroundColor = "#007bff";
+  hangUpBtn.style.backgroundColor = "#dc2626";
+
+  showRemoteLoading()
   
 };
 
 testConnection.onclick = () => {
   stompClient.send("/app/testServer", {}, "Test Server");
 };
+
+function showRemoteLoading() {
+    const loadingOverlay = document.getElementById('remoteVideoLoading');
+    loadingOverlay.style.opacity = '1';
+}
+
+function hideRemoteLoading() {
+    const loadingOverlay = document.getElementById('remoteVideoLoading');
+    loadingOverlay.style.opacity = '0';
+}
