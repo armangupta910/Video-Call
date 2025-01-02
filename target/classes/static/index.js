@@ -103,8 +103,8 @@ localPeer.oniceconnectionstatechange = () => {
 connectBtn.onclick = () => {
   // Connect to Websocket Server
   console.log("Button Pressed");
-  var socket = new SockJS("https://13.61.10.86:3000/websocket", { debug: false });
-  //   var socket = new SockJS("https://192.168.101.7:3000/websocket", { debug: false });
+  // var socket = new SockJS("https://13.61.10.86:3000/websocket", { debug: false });
+    var socket = new SockJS("https://192.168.101.7:3000/websocket", { debug: false });
 
   stompClient = Stomp.over(socket);
   localID = localIdInp.value;

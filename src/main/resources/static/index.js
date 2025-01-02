@@ -29,7 +29,29 @@ console.log("Started");
 // ICE Server Configurations
 const iceServers = {
   iceServers: [
-
+    {
+      urls: "stun:stun.relay.metered.ca:80",
+    },
+    {
+      urls: "turn:global.relay.metered.ca:80",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+    {
+      urls: "turn:global.relay.metered.ca:80?transport=tcp",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+    {
+      urls: "turn:global.relay.metered.ca:443",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
+    {
+      urls: "turns:global.relay.metered.ca:443?transport=tcp",
+      username: "7e8af7645a03aa5c038c9f28",
+      credential: "3QGhvh0q5E1pCdqS",
+    },
 ],
 };
 
@@ -81,7 +103,7 @@ localPeer.oniceconnectionstatechange = () => {
 connectBtn.onclick = () => {
   // Connect to Websocket Server
   console.log("Button Pressed");
-  // var socket = new SockJS("https://<IP>:<PORT>/websocket", { debug: false }); //Connect to this
+  // var socket = new SockJS("https://13.61.10.86:3000/websocket", { debug: false });
     var socket = new SockJS("https://192.168.101.7:3000/websocket", { debug: false });
 
   stompClient = Stomp.over(socket);
