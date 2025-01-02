@@ -35,7 +35,7 @@
 
 <h3>Diagram</h3>
     <p>Below is the system design diagram illustrating the flow of the application:</p>
-    <img src="diagram_placeholder" alt="System Design Diagram" style="max-width:100%; height:auto;">
+    <img src="systemDesign.png" alt="System Design Diagram" style="max-width:100%; height:auto;">
 
 <hr>
 
@@ -52,17 +52,12 @@
         <li>Build and run the Spring Boot application:
             <pre><code>./mvnw spring-boot:run</code></pre>
         </li>
+<li>Now open "https://localhost:3000" to access the frontend.
+</li>
     </ol>
 
-<h3>Frontend Setup</h3>
-    <ol>
-        <li>Navigate to the frontend directory:
-            <pre><code>cd frontend</code></pre>
-        </li>
-        <li>Open <code>index.html</code> in a browser to launch the application.</li>
-    </ol>
 
-    <hr>
+<hr>
 
 <h2>How It Works</h2>
     <ol>
@@ -90,11 +85,3 @@
     <p>Contributions are welcome! Please fork the repository and create a pull request with your changes.</p>
 
 <hr>
-
-<h2>License</h2>
-    <p>This project is licensed under the MIT License.</p>
-
-<hr>
-
-<h2>Contact</h2>
-    <p>For any inquiries, please contact [Your Email Address].</p>
